@@ -105,8 +105,22 @@ service cloud.firestore {
     // Sales collection rules
     match /sales/{saleId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
+      allow create, update: if isAuthenticated() 
+        && request.resource.data.keys().hasAll([
+          'productName',
+          'quantity',
+          'category',
+          'ingredients',
+          'lastUpdated',
+          'createdAt'
+        ])
+        && request.resource.data.productName is string
+        && request.resource.data.quantity is number
+        && request.resource.data.quantity > 0
+        && request.resource.data.category is string
+        && request.resource.data.ingredients is list
+        && request.resource.data.lastUpdated is timestamp
+        && request.resource.data.createdAt is timestamp;
       allow delete: if isAuthenticated() && (isAdmin() || isSuperAdmin());
     }
 
@@ -143,18 +157,6 @@ service cloud.firestore {
         && request.resource.data.lastUpdated is timestamp
         && request.resource.data.ingredients is list
         && request.resource.data.packaging is list;
-      allow delete: if isAuthenticated();
-    }
-
-    // Sales collection rules
-    match /sales/{saleId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() 
-        && isValidSaleData(request.resource.data);
-      allow update: if isAuthenticated()
-        && request.resource.data.quantity is number
-        && request.resource.data.quantity > 0
-        && request.resource.data.lastUpdated is timestamp;
       allow delete: if isAuthenticated();
     }
   }

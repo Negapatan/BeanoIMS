@@ -71,7 +71,17 @@ const INVENTORY_ITEMS = [
   'JAJANGMYEON',
   'TORANI WHITE CHOCOLATE SAUCE',
   'MONIN CARAMEL SAUCE',
-  'DRINKING WATER'
+  'DRINKING WATER',
+  'DW PAPER CUP 12oz w/lid',
+  'DW PAPER CUP 8oz w/lid',
+  'SC PET 95-12oz CUP w/lid',
+  'PET 95-16oz Y CUP w/lid',
+  'PLASTIC STRAW',
+  'WOODEN STIRRER',
+  'PLASTIC BAG (DOUBLE)',
+  'TABLE NAPKIN',
+  'TAKE OUT PAPER CONTAINER',
+  'PLASTIC CONTAINER',
 ];
 
 const AddInventory = () => {
@@ -115,19 +125,13 @@ const AddInventory = () => {
         });
       }
 
-      setNotification({
-        type: 'success',
-        message: 'Items added successfully!'
-      });
+      showNotification('success', 'Items added successfully!');
       
       // Reset form
       setItems([{ itemName: '', quantity: '', unit: '' }]);
     } catch (error) {
       console.error('Error adding items:', error);
-      setNotification({
-        type: 'error',
-        message: 'Failed to add items. Please try again.'
-      });
+      showNotification('error', 'Failed to add items. Please try again.');
     } finally {
       setLoading(false);
     }

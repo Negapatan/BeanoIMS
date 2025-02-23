@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  getDocs,
+  updateDoc,
+  doc,
+  serverTimestamp 
+} from 'firebase/firestore';
+import { db } from '../../firebase/config';
 import './RecordSale.css';
 import { recipeService } from '../../services/recipeService';
-import { salesService } from '../../services/salesService';
 import Notification from '../Notification/Notification';
 import SaleQuantityModal from './SaleQuantityModal';
 
@@ -35,11 +45,46 @@ const RecordSale = () => {
 
   const handleSaleConfirm = async (saleData) => {
     try {
-      await salesService.recordSale(saleData);
+      setLoading(true);
+      
+      const salesRef = collection(db, 'sales');
+      const q = query(
+        salesRef,
+        where('productName', '==', selectedItem.recipeName),
+        where('ingredients', '==', selectedItem.ingredients)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        // Update existing sale
+        const existingSale = querySnapshot.docs[0];
+        const existingData = existingSale.data();
+        
+        // Update quantity of existing sale
+        await updateDoc(doc(db, 'sales', existingSale.id), {
+          quantity: existingData.quantity + Number(saleData.quantity),
+          lastUpdated: serverTimestamp()
+        });
+      } else {
+        // Create new sale
+        await addDoc(collection(db, 'sales'), {
+          productName: selectedItem.recipeName,
+          category: selectedItem.category,
+          quantity: saleData.quantity,
+          ingredients: selectedItem.ingredients,
+          createdAt: serverTimestamp(),
+          lastUpdated: serverTimestamp()
+        });
+      }
+
       showNotification('success', 'Sale recorded successfully!');
+      setIsModalOpen(false);
     } catch (error) {
       console.error('Error recording sale:', error);
       showNotification('error', 'Failed to record sale');
+    } finally {
+      setLoading(false);
     }
   };
 

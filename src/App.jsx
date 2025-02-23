@@ -10,6 +10,7 @@ import Inventory from './components/Inventory/Inventory';
 import AddInventory from './components/AddInventory/AddInventory';
 import AddRecipe from './components/AddRecipe/AddRecipe';
 import RecordSale from './components/RecordSale/RecordSale';
+import SalesCounter from './components/SalesCounter/SalesCounter';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
                 <Route path="add-inventory" element={<AddInventory />} />
                 <Route path="add-recipe" element={<AddRecipe />} />
                 <Route path="add-sale" element={<RecordSale />} />
+                <Route path="sales-counter" element={<SalesCounter />} />
                 <Route index element={<Navigate to="/dashboard/inventory" replace />} />
               </Route>
             </Route>

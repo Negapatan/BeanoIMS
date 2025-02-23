@@ -68,7 +68,10 @@ const Inventory = () => {
   return (
     <div className="inventory-container">
       <div className="inventory-header">
-        <h1>Inventory List</h1>
+        <div className="inventory-title">
+          <span className="material-icons">inventory_2</span>
+          <h1>Inventory</h1>
+        </div>
         <div className="inventory-search-box">
           <span className="material-icons">search</span>
           <input

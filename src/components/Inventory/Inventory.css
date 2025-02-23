@@ -24,34 +24,37 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #edf0f2;
+  margin-bottom: 30px;
   width: 100%;
   box-sizing: border-box;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #c17f59;
 }
 
-.inventory-header h1 {
-  color: #2c1810;
-  font-size: 1.8rem;
-  font-weight: 600;
+.inventory-title {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.inventory-header h1::before {
-  content: 'inventory';
-  font-family: 'Material Icons';
-  font-size: 28px;
+.inventory-title .material-icons {
   color: #c17f59;
+  font-size: 32px;
+  margin-right: 5px;
+}
+
+.inventory-title h1 {
+  color: #2c1810;
+  font-size: 1.8rem;
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
 }
 
 .inventory-search-box {
   position: relative;
   width: 100%;
   max-width: 400px;
-  margin-left: auto;
   box-sizing: border-box;
 }
 
@@ -63,6 +66,7 @@
   font-size: 0.9rem;
   box-sizing: border-box;
   transition: all 0.3s ease;
+  background: #f8f9fa;
 }
 
 .inventory-search-box input:focus {

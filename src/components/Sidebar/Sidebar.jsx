@@ -28,6 +28,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           path: '/dashboard/add-sale',
           name: 'Record Sale',
           icon: 'add_shopping_cart'
+        },
+        {
+          path: '/dashboard/sales-counter',
+          name: 'Sales Counter',
+          icon: 'analytics'
         }
       ]
     },
