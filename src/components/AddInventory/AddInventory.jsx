@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './AddInventory.css';
-import { inventoryService } from '../../services/inventoryService';
+import { inventoryService } from '../../services/inventoryService.js';
 import Notification from '../Notification/Notification';
 import SearchableSelect from '../SearchableSelect/SearchableSelect';
 
@@ -102,34 +102,32 @@ const AddInventory = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
+    
     try {
-      // Validate all items
-      const hasEmptyFields = items.some(item => 
-        !item.itemName || !item.quantity || !item.unit
-      );
+      setLoading(true);
       
-      if (hasEmptyFields) {
-        showNotification('error', 'Please fill in all fields for all items');
-        return;
-      }
-
-      // Add all items
+      // Add each item to inventory
       for (const item of items) {
         await inventoryService.addItem({
           itemName: item.itemName,
           quantity: Number(item.quantity),
-          unit: item.unit,
-          lastUpdated: new Date()
+          unit: item.unit
         });
       }
 
+      setNotification({
+        type: 'success',
+        message: 'Items added successfully!'
+      });
+      
+      // Reset form
       setItems([{ itemName: '', quantity: '', unit: '' }]);
-      showNotification('success', 'Items added successfully!');
     } catch (error) {
       console.error('Error adding items:', error);
-      showNotification('error', 'Failed to add items');
+      setNotification({
+        type: 'error',
+        message: 'Failed to add items. Please try again.'
+      });
     } finally {
       setLoading(false);
     }

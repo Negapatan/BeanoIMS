@@ -58,33 +58,34 @@
   position: relative;
   z-index: 2;
   padding: 3rem;
-  background: rgba(44, 24, 16, 0.8);
+  background: rgba(44, 24, 16, 0.85);
   backdrop-filter: blur(15px);
   border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(193, 127, 89, 0.2);
 }
 
 .login-form input {
   padding: 15px 20px;
-  border: 2px solid rgba(193, 127, 89, 0.3);
+  border: none;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.95);
   font-size: 1.1rem;
   transition: all 0.3s ease;
   color: #2c1810;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .login-form input:focus {
   outline: none;
-  border-color: #c17f59;
+  background: white;
   box-shadow: 0 0 15px rgba(193, 127, 89, 0.3);
   transform: translateY(-2px);
 }
 
-.login-form button {
+.login-form button[type="submit"] {
   padding: 18px;
-  background: linear-gradient(135deg, #c17f59 0%, #8b5e3c 100%);
+  background: linear-gradient(135deg, #c17f59 0%, #a66d4b 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -93,14 +94,15 @@
   text-transform: uppercase;
   letter-spacing: 2px;
   transition: all 0.3s ease;
-  margin-top: 10px;
+  margin-top: 15px;
   cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .login-form button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #d38a5f 0%, #9b6842 100%);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #d38a5f 0%, #b17449 100%);
 }
 
 @media (max-width: 480px) {
@@ -153,4 +155,50 @@
   content: "check_circle";
   font-family: 'Material Icons';
   font-size: 20px;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5px;
+  margin: 8px 0 15px;
+  font-size: 0.9rem;
+  color: rgba(230, 213, 184, 0.9);
+  width: 100%;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  user-select: none;
+}
+
+.remember-me:hover {
+  color: #e6d5b8;
+}
+
+.remember-me input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: #c17f59;
+  margin: 0;
+}
+
+.forgot-password {
+  color: #c17f59;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-left: auto;
+}
+
+.forgot-password:hover {
+  color: #d38a5f;
+  opacity: 1;
 } 

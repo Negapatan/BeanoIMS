@@ -6,20 +6,30 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+    }
+
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
 
     function isValidUser(userData) {
-      return userData.keys().hasAll(['username', 'usernameLower', 'email', 'role', 'createdAt']) &&
-             userData.username is string &&
-             userData.username.size() >= 3 &&
-             userData.usernameLower is string &&
-             userData.usernameLower == userData.username.lower() &&
-             userData.email is string &&
-             userData.email.matches('^[^@]+@[^@]+\\.[^@]+$') &&
-             userData.role in ['user', 'admin'] &&
-             userData.createdAt is string;
+      return userData.keys().hasAll([
+        'email', 
+        'role', 
+        'createdAt'
+      ]) &&
+      userData.email is string &&
+      userData.email.matches('^[^@]+@[^@]+\\.[^@]+$') &&
+      userData.role in ['user', 'admin'] &&
+      userData.createdAt is timestamp;
     }
 
     function isValidRecipe(recipeData) {
@@ -73,41 +83,31 @@ service cloud.firestore {
 
     // Users collection rules
     match /users/{userId} {
-      allow read: if true;
-      allow create: if true;
-      allow update, delete: if isAuthenticated() && isOwner(userId);
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin() || isSuperAdmin());
+      allow create: if request.auth.uid == userId && 
+        request.resource.data.keys().hasAll(['email', 'role', 'createdAt']) &&
+        request.resource.data.role == 'user';
+      allow update, delete: if isSuperAdmin();
     }
 
     // Inventory collection rules
     match /inventory/{itemId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && isValidInventoryItem(request.resource.data);
-      allow update: if isAuthenticated() && isValidInventoryItem(request.resource.data);
-      allow delete: if isAuthenticated();
-      
-      // Allow batch updates when purchase is completed
-      allow update: if isAuthenticated()
-        && request.resource.data.lastUpdated is string
-        && isValidDateString(request.resource.data.lastUpdated)
-        && request.resource.data.quantity > 0;
+      allow write: if isAuthenticated();
     }
 
     // Recipes collection rules
     match /recipes/{recipeId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && isValidRecipe(request.resource.data);
-      allow update: if isAuthenticated() 
-        && request.resource.data.lastUpdated is timestamp;
-      allow delete: if isAuthenticated();
+      allow write: if isAuthenticated() && (isAdmin() || isSuperAdmin());
     }
 
     // Sales collection rules
     match /sales/{saleId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && isValidSale(request.resource.data);
-      allow update: if isAuthenticated() 
-        && request.resource.data.lastUpdated is timestamp;
-      allow delete: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && (isAdmin() || isSuperAdmin());
     }
 
     // Purchase collection rules

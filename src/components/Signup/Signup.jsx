@@ -8,7 +8,6 @@ const Signup = () => {
   const navigate = useNavigate();
   const { signup } = useAuth();
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -18,13 +17,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
 
   const validateForm = () => {
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.email || !formData.password || !formData.confirmPassword) {
       setError('All fields are required');
-      return false;
-    }
-
-    if (formData.username.length < 3) {
-      setError('Username must be at least 3 characters long');
       return false;
     }
 
@@ -52,7 +46,9 @@ const Signup = () => {
       setError('');
       setLoading(true);
       
-      await signup(formData.email, formData.password, formData.username);
+      const normalizedEmail = formData.email?.toLowerCase();
+      
+      await signup(normalizedEmail, formData.password);
       setSuccess(true);
       setLoading(false); // Disable loading state to show success message
       
@@ -88,19 +84,9 @@ const Signup = () => {
           Account created successfully! Redirecting to login...
         </div>}
         <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          disabled={loading}
-          required
-          minLength={3}
-        />
-        <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="Email Address"
           value={formData.email}
           onChange={handleChange}
           disabled={loading}

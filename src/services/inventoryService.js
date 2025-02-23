@@ -31,58 +31,19 @@ export const inventoryService = {
   },
 
   // Subscribe to inventory changes
-  subscribeToInventory: (onUpdate) => {
-    const q = query(collection(db, COLLECTION_NAME), orderBy('lastUpdated', 'desc'));
-    
-    return onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data
-        };
-      });
-      onUpdate(items);
-    }, (error) => {
-      console.error('Error fetching inventory:', error);
-      throw error;
+  subscribeToInventory: (callback) => {
+    return onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      callback(items);
     });
   },
 
-  // Add or update inventory item
-  addInventoryItem: async (itemData) => {
+  // Add new inventory item
+  addItem: async (itemData) => {
     try {
-      // Check if item already exists
-      const q = query(
-        collection(db, COLLECTION_NAME),
-        where('itemName', '==', itemData.itemName)
-      );
-      const querySnapshot = await getDocs(q);
-      
-      if (!querySnapshot.empty) {
-        const existingItem = querySnapshot.docs[0];
-        const existingData = existingItem.data();
-
-        // If units match, add quantities
-        if (existingData.unit === itemData.unit) {
-          await updateDoc(doc(db, COLLECTION_NAME, existingItem.id), {
-            quantity: existingData.quantity + Number(itemData.quantity),
-            lastUpdated: serverTimestamp()
-          });
-          return existingItem.id;
-        } else {
-          // If units don't match, create new item with modified name
-          const newItemName = `${itemData.itemName} (${itemData.unit})`;
-          const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-            ...itemData,
-            itemName: newItemName,
-            lastUpdated: serverTimestamp()
-          });
-          return docRef.id;
-        }
-      }
-
-      // If item doesn't exist, create new entry
       const docRef = await addDoc(collection(db, COLLECTION_NAME), {
         ...itemData,
         lastUpdated: serverTimestamp()
@@ -94,11 +55,11 @@ export const inventoryService = {
     }
   },
 
-  // Update item
-  updateItem: async (id, itemData) => {
+  // Update inventory item
+  updateItem: async (itemId, itemData) => {
     try {
-      const docRef = doc(db, COLLECTION_NAME, id);
-      await updateDoc(docRef, {
+      const itemRef = doc(db, COLLECTION_NAME, itemId);
+      await updateDoc(itemRef, {
         ...itemData,
         lastUpdated: serverTimestamp()
       });
@@ -108,11 +69,10 @@ export const inventoryService = {
     }
   },
 
-  // Delete item
-  deleteItem: async (id) => {
+  // Delete inventory item
+  deleteItem: async (itemId) => {
     try {
-      const docRef = doc(db, COLLECTION_NAME, id);
-      await deleteDoc(docRef);
+      await deleteDoc(doc(db, COLLECTION_NAME, itemId));
     } catch (error) {
       console.error('Error deleting inventory item:', error);
       throw error;
