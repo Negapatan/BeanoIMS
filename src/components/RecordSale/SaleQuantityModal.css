@@ -1,0 +1,205 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.sale-quantity-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  color: #2c1810;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #f5f5f5;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  color: #2c1810;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #e6e6e6;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #c17f59;
+  box-shadow: 0 0 0 3px rgba(193, 127, 89, 0.1);
+}
+
+/* Hide number input spinners */
+.form-group input[type="number"]::-webkit-inner-spin-button,
+.form-group input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.form-group input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.custom-order-toggle {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.custom-order-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2c1810;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.addons-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.addons-section h3 {
+  color: #2c1810;
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+}
+
+.addon-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: start;
+}
+
+.remove-addon {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-addon:hover {
+  background: rgba(211, 47, 47, 0.1);
+}
+
+.add-addon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #c17f59;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.add-addon:hover {
+  background: rgba(193, 127, 89, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn {
+  background: #f5f5f5;
+  border: none;
+  color: #666;
+}
+
+.cancel-btn:hover {
+  background: #eeeeee;
+}
+
+.confirm-btn {
+  background: #c17f59;
+  border: none;
+  color: white;
+}
+
+.confirm-btn:hover {
+  background: #a66d4b;
+}
+
+@media (max-width: 768px) {
+  .addon-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .addon-row .form-group:last-child {
+    grid-column: 1 / -1;
+  }
+} 

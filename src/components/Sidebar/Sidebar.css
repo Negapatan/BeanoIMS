@@ -1,0 +1,242 @@
+.sidebar {
+  height: 100vh;
+  background: linear-gradient(180deg, #2c1810 0%, #241209 100%);
+  position: fixed;
+  top: 0; /* Start from the top */
+  left: 0;
+  transition: all 0.3s ease;
+  z-index: 100;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar.closed {
+  width: 60px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: linear-gradient(90deg, #4a2c22 0%, #3a231b 100%);
+  color: #e6d5b8;
+  height: 60px;
+  position: relative; /* Added for absolute positioning of toggle button */
+  border-bottom: 1px solid rgba(193, 127, 89, 0.2);
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 2rem;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  opacity: 1;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  color: #e6d5b8;
+  background: linear-gradient(to right, #e6d5b8, #c17f59);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 0 5px;
+}
+
+.closed .sidebar-title {
+  opacity: 0;
+  width: 0;
+  margin: 0;
+  transform: translateX(-20px);
+}
+
+.toggle-btn {
+  background-color: transparent;
+  color: #e6d5b8;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  position: absolute;
+  right: 10px;
+}
+
+.closed .toggle-btn {
+  right: 10px;
+  margin: 0;
+}
+
+.toggle-btn:hover {
+  background: rgba(193, 127, 89, 0.2);
+  color: #c17f59;
+}
+
+.toggle-btn .material-icons {
+  font-size: 24px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100% - 60px); /* Subtract header height */
+  padding: 20px 10px;
+  color: #e6d5b8;
+  flex-grow: 1;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(44, 24, 16, 0.95) 0%, rgba(36, 18, 9, 0.95) 100%);
+}
+
+/* Hide content text when sidebar is closed */
+.closed .sidebar-content {
+  padding: 20px 5px;
+  white-space: nowrap;
+  opacity: 1; /* Keep content visible */
+}
+
+.sidebar-menu {
+  flex-grow: 1;
+  padding: 20px 10px;
+}
+
+.menu-section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  padding: 0 20px;
+  margin-bottom: 10px;
+  color: rgba(230, 213, 184, 0.5);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.closed .section-title {
+  padding: 0 12px;
+}
+
+.closed .section-title .section-text {
+  display: none;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 20px;
+  color: #e6d5b8;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  position: relative;
+  margin: 4px 8px;
+}
+
+.menu-icon {
+  min-width: 24px;
+  font-size: 24px;
+  transition: all 0.3s ease;
+}
+
+.menu-text {
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+/* Update closed state styles */
+.closed .menu-item {
+  padding: 12px;
+  justify-content: center;
+  margin: 4px;
+}
+
+.closed .menu-text {
+  opacity: 0;
+  width: 0;
+  position: absolute;
+}
+
+/* Add spacing between sections in closed state */
+.closed .menu-section {
+  margin-bottom: 20px;
+}
+
+/* Hover effect for closed state */
+.closed .menu-item:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(44, 24, 16, 0.9);
+  color: #e6d5b8;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  margin-left: 10px;
+  z-index: 1000;
+}
+
+/* Active state */
+.menu-item.active {
+  background: rgba(193, 127, 89, 0.2);
+  color: #c17f59;
+}
+
+.menu-item:hover {
+  background: rgba(193, 127, 89, 0.1);
+  color: #c17f59;
+}
+
+/* Ensure icons remain visible in closed state */
+.closed .menu-icon {
+  margin: 0;
+  color: inherit;
+}
+
+.sidebar-footer {
+  padding: 20px 0;
+  border-top: 1px solid rgba(230, 213, 184, 0.1);
+  margin-top: auto;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #e6d5b8;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: rgba(193, 127, 89, 0.1);
+  color: #c17f59;
+}
+
+.closed .logout-btn {
+  padding: 12px;
+  justify-content: center;
+}
+
+.closed .logout-btn .menu-text {
+  display: none;
+} 

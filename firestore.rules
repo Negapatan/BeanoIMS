@@ -1,0 +1,161 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isValidUser(userData) {
+      return userData.keys().hasAll(['username', 'usernameLower', 'email', 'role', 'createdAt']) &&
+             userData.username is string &&
+             userData.username.size() >= 3 &&
+             userData.usernameLower is string &&
+             userData.usernameLower == userData.username.lower() &&
+             userData.email is string &&
+             userData.email.matches('^[^@]+@[^@]+\\.[^@]+$') &&
+             userData.role in ['user', 'admin'] &&
+             userData.createdAt is string;
+    }
+
+    function isValidRecipe(recipeData) {
+      return recipeData.keys().hasAll(['recipeName', 'category', 'ingredients', 'createdAt', 'lastUpdated']) &&
+             recipeData.recipeName is string &&
+             recipeData.recipeName.size() > 0 &&
+             recipeData.category in ['Coffee', 'Non-Coffee', 'Food'] &&
+             recipeData.ingredients is list &&
+             recipeData.createdAt is timestamp &&
+             recipeData.lastUpdated is timestamp;
+    }
+
+    function isValidSale(saleData) {
+      return saleData.keys().hasAll(['productName', 'category', 'quantity', 'price', 'date']) &&
+             saleData.productName is string &&
+             saleData.productName.size() > 0 &&
+             saleData.category in ['Coffee', 'Non-Coffee', 'Food'] &&
+             saleData.quantity is number &&
+             saleData.quantity > 0 &&
+             saleData.price is number &&
+             saleData.price >= 0 &&
+             saleData.date is timestamp;
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string && 
+             dateStr.matches('^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z$');
+    }
+
+    function isValidSaleData(saleData) {
+      return saleData.keys().hasAll(['productName', 'quantity', 'date', 'category', 'createdAt', 'lastUpdated']) &&
+             saleData.productName is string &&
+             saleData.productName.size() > 0 &&
+             saleData.quantity is number &&
+             saleData.quantity > 0 &&
+             saleData.date is timestamp &&
+             saleData.category is string &&
+             saleData.createdAt is timestamp &&
+             saleData.lastUpdated is timestamp;
+    }
+
+    function isValidInventoryItem(itemData) {
+      return itemData.keys().hasAll(['itemName', 'quantity', 'unit', 'lastUpdated']) &&
+             itemData.itemName is string &&
+             itemData.itemName.size() > 0 &&
+             itemData.quantity is number &&
+             itemData.quantity >= 0 &&
+             itemData.unit in ['g', 'kg', 'ml', 'L', 'pcs', 'pack'] &&
+             itemData.lastUpdated is timestamp;
+    }
+
+    // Users collection rules
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Inventory collection rules
+    match /inventory/{itemId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidInventoryItem(request.resource.data);
+      allow update: if isAuthenticated() && isValidInventoryItem(request.resource.data);
+      allow delete: if isAuthenticated();
+      
+      // Allow batch updates when purchase is completed
+      allow update: if isAuthenticated()
+        && request.resource.data.lastUpdated is string
+        && isValidDateString(request.resource.data.lastUpdated)
+        && request.resource.data.quantity > 0;
+    }
+
+    // Recipes collection rules
+    match /recipes/{recipeId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidRecipe(request.resource.data);
+      allow update: if isAuthenticated() 
+        && request.resource.data.lastUpdated is timestamp;
+      allow delete: if isAuthenticated();
+    }
+
+    // Sales collection rules
+    match /sales/{saleId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidSale(request.resource.data);
+      allow update: if isAuthenticated() 
+        && request.resource.data.lastUpdated is timestamp;
+      allow delete: if isAuthenticated();
+    }
+
+    // Purchase collection rules
+    match /purchases/{purchaseId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && request.resource.data.itemName is string
+        && request.resource.data.quantity is number
+        && request.resource.data.quantity > 0
+        && request.resource.data.pricePerUnit is number
+        && request.resource.data.pricePerUnit > 0
+        && request.resource.data.supplier is string
+        && request.resource.data.status in ['pending', 'completed', 'cancelled']
+        && request.resource.data.purchaseDate is string
+        && request.resource.data.unit is string;
+      
+      allow update: if isAuthenticated()
+        && request.resource.data.status in ['pending', 'completed', 'cancelled'];
+      
+      allow delete: if isAuthenticated();
+    }
+
+    // Ingredients collection rules
+    match /ingredients/{ingredientId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && request.resource.data.productName is string
+        && request.resource.data.ingredients is list
+        && request.resource.data.packaging is list
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.lastUpdated is timestamp;
+      allow update: if isAuthenticated()
+        && request.resource.data.lastUpdated is timestamp
+        && request.resource.data.ingredients is list
+        && request.resource.data.packaging is list;
+      allow delete: if isAuthenticated();
+    }
+
+    // Sales collection rules
+    match /sales/{saleId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() 
+        && isValidSaleData(request.resource.data);
+      allow update: if isAuthenticated()
+        && request.resource.data.quantity is number
+        && request.resource.data.quantity > 0
+        && request.resource.data.lastUpdated is timestamp;
+      allow delete: if isAuthenticated();
+    }
+  }
+} 

@@ -1,0 +1,156 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  color: #e6d5b8;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--login-bg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px) brightness(0.5);
+  z-index: -1;
+  transform: scale(1.1);
+}
+
+.login-container .top-bar {
+  width: 100%;
+  background-color: rgba(44, 24, 16, 0.9);
+  padding: 15px 0;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  border-bottom: 2px solid rgba(193, 127, 89, 0.3);
+  margin-bottom: 80px;
+}
+
+.login-container h1 {
+  font-size: 3rem;
+  margin-top: 120px;
+  margin-bottom: 3rem;
+  font-family: 'Georgia', serif;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  padding: 3rem;
+  background: rgba(44, 24, 16, 0.8);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(193, 127, 89, 0.2);
+}
+
+.login-form input {
+  padding: 15px 20px;
+  border: 2px solid rgba(193, 127, 89, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  color: #2c1810;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #c17f59;
+  box-shadow: 0 0 15px rgba(193, 127, 89, 0.3);
+  transform: translateY(-2px);
+}
+
+.login-form button {
+  padding: 18px;
+  background: linear-gradient(135deg, #c17f59 0%, #8b5e3c 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #d38a5f 0%, #9b6842 100%);
+}
+
+@media (max-width: 480px) {
+  .login-container h1 {
+    font-size: 2rem;
+  }
+  
+  .login-form {
+    padding: 1.5rem;
+  }
+}
+
+.auth-link-container {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 0.95rem;
+  color: #e6d5b8;
+}
+
+.signup-link {
+  color: #c17f59;
+  text-decoration: none;
+  margin-left: 5px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.signup-link:hover {
+  color: #d38a5f;
+  text-decoration: underline;
+}
+
+.success-message {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 15px 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 20px;
+  border: 1px solid rgba(40, 167, 69, 0.2);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+.success-message::before {
+  content: "check_circle";
+  font-family: 'Material Icons';
+  font-size: 20px;
+} 
