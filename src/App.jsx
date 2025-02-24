@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext.js';
+import AuthProvider from './contexts/AuthContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import LoginBeano from './components/LoginBeano/LoginBeano';
 import Signup from './components/Signup/Signup';
@@ -14,8 +14,8 @@ import SalesCounter from './components/SalesCounter/SalesCounter';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <div className="App">
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
@@ -36,8 +36,8 @@ function App() {
             </Route>
           </Routes>
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

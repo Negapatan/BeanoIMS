@@ -4,7 +4,6 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   height: calc(100vh - 60px);
-  overflow-y: auto;
 }
 
 .form-header {
@@ -63,12 +62,22 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid #edf0f2;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+
+.recipes-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #2c1810;
 }
 
 .recipes-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  min-width: 1200px;
 }
 
 .recipes-table th {
@@ -114,21 +123,21 @@
 }
 
 /* Column specific styles */
-.recipes-table td:nth-child(1) { /* Product Name */
-  width: 30%;
+.recipes-table td:nth-child(1) {
+  width: 20%;
   font-weight: 500;
   color: #2c1810;
   border-left: 3px solid #c17f59;
 }
 
-.recipes-table td:nth-child(2) { /* Category */
-  width: 20%;
+.recipes-table td:nth-child(2) {
+  width: 12%;
   color: #c17f59;
   text-align: center;
 }
 
-.recipes-table td:nth-child(3) { /* Size */
-  width: 15%;
+.recipes-table td:nth-child(3) {
+  width: 10%;
   text-align: center;
 }
 
@@ -138,12 +147,16 @@
   text-align: center;
 }
 
-.recipes-table td:nth-child(4) { /* Ingredients */
-  width: 35%;
+.recipes-table td:nth-child(4) {
+  width: 28%;
+}
+
+.recipes-table td:nth-child(5) {
+  width: 22%;
 }
 
 .recipes-table td:last-child {
-  width: 120px;
+  width: 8%;
   text-align: center;
 }
 
@@ -162,11 +175,32 @@
 
 .ingredients-list li {
   display: inline-block;
-  margin-right: 12px;
+  margin-right: 8px;
+  margin-bottom: 4px;
   padding: 4px 8px;
   background: #f8f9fa;
   border-radius: 4px;
   border: 1px solid #edf0f2;
+  white-space: nowrap;
+}
+
+.packaging-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.packaging-list li {
+  display: inline-block;
+  margin-right: 8px;
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #edf0f2;
+  white-space: nowrap;
 }
 
 .record-btn {
@@ -223,4 +257,24 @@
   .record-btn {
     padding: 6px 12px;
   }
+}
+
+/* Scrollbar styling */
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #c17f59;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #a66d4b;
 } 

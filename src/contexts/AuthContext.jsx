@@ -14,20 +14,24 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
 
   const signup = async (email, password) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     
-    // Update user profile in Firestore
     await setDoc(doc(db, 'users', userCredential.user.uid), {
       email: email,
       role: 'user',
@@ -43,7 +47,7 @@ export function AuthProvider({ children }) {
       const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
       const userData = userDoc.data();
       
-      // Update current user with Firestore data
+      setUserRole(userData.role);
       setCurrentUser({ ...userCredential.user, ...userData });
       
       return userCredential;
@@ -54,6 +58,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    setUserRole(null);
     return signOut(auth);
   };
 
@@ -64,21 +69,24 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Get user data from Firestore
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         const userData = userDoc.data();
+        console.log('User data from Firestore:', userData);
+        setUserRole(userData.role);
         setCurrentUser({ ...user, ...userData });
       } else {
         setCurrentUser(null);
+        setUserRole(null);
       }
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, []);
 
   const value = {
     currentUser,
+    userRole,
     signup,
     login,
     logout,
@@ -92,4 +100,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-export { AuthContext }; 
+export default AuthProvider; 

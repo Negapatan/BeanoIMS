@@ -70,82 +70,141 @@
 }
 
 .sales-counter__items {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  overflow-x: auto;
 }
 
-.sales-counter__item {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.sales-table thead {
   background: #f8f9fa;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(193, 127, 89, 0.2);
-  justify-content: space-between;
-  position: relative;
 }
 
-.sales-counter__item:hover {
+.sales-table th {
+  padding: 12px 16px;
+  text-align: center;
+  font-weight: 500;
+  color: #2c1810;
+  border-bottom: 2px solid rgba(193, 127, 89, 0.2);
+}
+
+/* Table Column Widths and Alignment */
+.sales-table__product-col { 
+  width: 30%; 
+  text-align: left;
+}
+
+.sales-table__quantity-col { 
+  width: 20%; 
+  text-align: center;
+}
+
+.sales-table__category-col { 
+  width: 20%; 
+  text-align: center;
+}
+
+.sales-table__time-col { 
+  width: 15%; 
+  text-align: center;
+}
+
+.sales-table__action-col { 
+  width: 15%; 
+  text-align: center;
+  padding: 0 !important;
+}
+
+.sales-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(193, 127, 89, 0.1);
+  vertical-align: middle;
+}
+
+/* Delete Button Styles */
+.sales-table__delete-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+}
+
+.sales-table__delete-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #dc3545;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.sales-table__delete-btn[data-disabled="true"] {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.sales-table__delete-btn:hover {
+  opacity: 1;
+  background: rgba(220, 53, 69, 0.1);
+  transform: scale(1.1);
+}
+
+.sales-table__delete-btn .material-icons {
+  font-size: 22px;
+}
+
+.sales-table__row:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-color: rgba(193, 127, 89, 0.4);
   background: #fff;
 }
 
-.sales-counter__item-details {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  flex: 1;
-}
-
-.sales-counter__product-name {
+.sales-table__product {
   color: #2c1810;
   font-weight: 500;
   font-size: 1.1rem;
-  min-width: 200px;
 }
 
-.sales-counter__quantity {
+.quantity-badge {
   background: #c17f59;
   color: white;
   padding: 6px 15px;
   border-radius: 20px;
   font-size: 0.95rem;
   font-weight: 500;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  min-width: 100px;
   justify-content: center;
+  min-width: 100px;
 }
 
-.sales-counter__quantity::before {
-  content: 'shopping_cart';
-  font-family: 'Material Icons';
-  font-size: 18px;
-}
-
-.sales-counter__category {
+.category-badge {
   background: rgba(193, 127, 89, 0.1);
   color: #c17f59;
   padding: 6px 15px;
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
-  min-width: 100px;
-  text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  min-width: 100px;
 }
 
-.sales-counter__date {
+.sales-table__time {
   color: #666;
   font-size: 0.9rem;
-  min-width: 180px;
-  text-align: right;
   font-weight: 500;
 }
 

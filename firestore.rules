@@ -111,6 +111,7 @@ service cloud.firestore {
           'quantity',
           'category',
           'ingredients',
+          'packaging',
           'lastUpdated',
           'saleDate',
           'createdAt'
@@ -120,10 +121,12 @@ service cloud.firestore {
         && request.resource.data.quantity > 0
         && request.resource.data.category is string
         && request.resource.data.ingredients is list
+        && request.resource.data.packaging is list
         && request.resource.data.lastUpdated is timestamp
         && request.resource.data.saleDate is timestamp
         && request.resource.data.createdAt is timestamp;
-      allow delete: if isAuthenticated() && (isAdmin() || isSuperAdmin());
+      allow delete: if isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
     }
 
     // Purchase collection rules

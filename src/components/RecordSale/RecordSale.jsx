@@ -14,6 +14,7 @@ import './RecordSale.css';
 import { recipeService } from '../../services/recipeService';
 import Notification from '../Notification/Notification';
 import SaleQuantityModal from './SaleQuantityModal';
+import { inventoryService } from '../../services/inventoryService';
 
 const RecordSale = () => {
   const [recipes, setRecipes] = useState([]);
@@ -50,11 +51,19 @@ const RecordSale = () => {
       // Convert date string to Firestore timestamp
       const saleTimestamp = new Date(saleData.saleDate);
       
+      // Check if we have enough packaging materials
+      const hasEnoughPackaging = await checkPackagingAvailability(selectedItem.packaging, saleData.quantity);
+      if (!hasEnoughPackaging) {
+        showNotification('error', 'Not enough packaging materials in inventory!');
+        return;
+      }
+
       const salesRef = collection(db, 'sales');
       const q = query(
         salesRef,
         where('productName', '==', selectedItem.recipeName),
         where('ingredients', '==', selectedItem.ingredients),
+        where('packaging', '==', selectedItem.packaging),
         where('saleDate', '==', saleTimestamp)
       );
       
@@ -70,6 +79,9 @@ const RecordSale = () => {
           quantity: existingData.quantity + Number(saleData.quantity),
           lastUpdated: serverTimestamp()
         });
+
+        // Update packaging quantities
+        await updatePackagingQuantities(selectedItem.packaging, saleData.quantity);
       } else {
         // Create new sale
         await addDoc(collection(db, 'sales'), {
@@ -77,10 +89,14 @@ const RecordSale = () => {
           category: selectedItem.category,
           quantity: saleData.quantity,
           ingredients: selectedItem.ingredients,
+          packaging: selectedItem.packaging || [],
           saleDate: saleTimestamp,
           createdAt: serverTimestamp(),
           lastUpdated: serverTimestamp()
         });
+
+        // Update packaging quantities
+        await updatePackagingQuantities(selectedItem.packaging, saleData.quantity);
       }
 
       showNotification('success', 'Sale recorded successfully!');
@@ -90,6 +106,48 @@ const RecordSale = () => {
       showNotification('error', 'Failed to record sale');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkPackagingAvailability = async (packaging, orderQuantity) => {
+    try {
+      const inventoryItems = await inventoryService.getInventoryItems();
+      
+      for (const pkg of packaging) {
+        const inventoryItem = inventoryItems.find(item => 
+          item.itemName.toLowerCase() === pkg.name.toLowerCase()
+        );
+        
+        // Calculate total needed quantity
+        const neededQuantity = pkg.quantity * orderQuantity;
+        
+        if (!inventoryItem || inventoryItem.quantity < neededQuantity) {
+          showNotification('error', `Not enough ${pkg.name} in inventory!`);
+          return false;
+        }
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error checking packaging:', error);
+      return false;
+    }
+  };
+
+  const updatePackagingQuantities = async (packaging, orderQuantity) => {
+    try {
+      for (const pkg of packaging) {
+        // Calculate total quantity to subtract
+        const quantityToSubtract = pkg.quantity * orderQuantity;
+        
+        await inventoryService.updateItemQuantity(
+          pkg.name,
+          -quantityToSubtract // Subtract the total used quantity
+        );
+      }
+    } catch (error) {
+      console.error('Error updating packaging quantities:', error);
+      throw new Error('Failed to update packaging quantities');
     }
   };
 
@@ -142,6 +200,7 @@ const RecordSale = () => {
               <th>CATEGORY</th>
               <th>SIZE</th>
               <th>INGREDIENTS</th>
+              <th>PACKAGING</th>
               <th>ACTION</th>
             </tr>
           </thead>
@@ -161,13 +220,22 @@ const RecordSale = () => {
                   </ul>
                 </td>
                 <td>
+                  <ul className="packaging-list">
+                    {recipe.packaging?.map((pkg, index) => (
+                      <li key={index}>
+                        {pkg.name}: {pkg.quantity} {pkg.unit}
+                      </li>
+                    )) || 'No packaging'}
+                  </ul>
+                </td>
+                <td>
                   <button
                     className="record-btn"
                     onClick={() => handleItemSelect(recipe)}
                     disabled={loading}
                   >
                     <span className="material-icons">point_of_sale</span>
-                    Record Sale
+                    Sale
                   </button>
                 </td>
               </tr>
