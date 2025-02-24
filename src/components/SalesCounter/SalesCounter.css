@@ -12,15 +12,19 @@
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #c17f59;
 }
 
 .sales-counter__title {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #c17f59;
-  margin-bottom: 10px;
+  flex: 1;
 }
 
 .sales-counter__title .material-icons {
@@ -35,6 +39,7 @@
   margin: 0;
   font-family: 'Playfair Display', serif;
   font-weight: 700;
+  margin-right: 20px;
 }
 
 .sales-counter__list {
@@ -49,6 +54,10 @@
 
 .sales-counter__date-group {
   margin-bottom: 30px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .sales-counter__date-header {
@@ -57,13 +66,13 @@
   font-weight: 500;
   margin-bottom: 15px;
   padding-bottom: 8px;
+  border-bottom: 1px solid rgba(193, 127, 89, 0.2);
 }
 
 .sales-counter__items {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-left: 15px;
 }
 
 .sales-counter__item {
@@ -207,4 +216,48 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.sales-counter__filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.sales-counter__filter input[type="date"] {
+  padding: 8px 12px;
+  border: 2px solid rgba(193, 127, 89, 0.2);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #2c1810;
+  background: #f8f9fa;
+  min-width: 150px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sales-counter__filter input[type="date"]:hover {
+  border-color: rgba(193, 127, 89, 0.4);
+  background: #fff;
+}
+
+.sales-counter__filter input[type="date"]:focus {
+  outline: none;
+  border-color: #c17f59;
+  box-shadow: 0 0 0 3px rgba(193, 127, 89, 0.1);
+}
+
+/* Customize the date input calendar icon */
+.sales-counter__filter input[type="date"]::-webkit-calendar-picker-indicator {
+  color: #c17f59;
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 4px;
+}
+
+.sales-counter__filter input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 } 

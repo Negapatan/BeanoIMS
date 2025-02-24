@@ -8,6 +8,7 @@ const SaleQuantityModal = ({ isOpen, onClose, item, onConfirm }) => {
   const [addons, setAddons] = useState([{ name: '', quantity: '', unit: '' }]);
   const [isCustomOrder, setIsCustomOrder] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [saleDate, setSaleDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleQuantityChange = (e) => {
     const value = e.target.value;
@@ -66,7 +67,7 @@ const SaleQuantityModal = ({ isOpen, onClose, item, onConfirm }) => {
         category: item.category,
         size: item.size || 'N/A',
         quantity: quantity,
-        date: new Date(),
+        saleDate: new Date(saleDate),
         isCustomOrder,
         addons: isCustomOrder ? addons : []
       };
@@ -125,112 +126,125 @@ const SaleQuantityModal = ({ isOpen, onClose, item, onConfirm }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="sale-quantity-modal">
-        <div className="modal-header">
-          <h2>Record Sale: {item.recipeName}</h2>
-          <button className="close-btn" onClick={onClose}>
-            <span className="material-icons">close</span>
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Quantity</label>
-            <input
-              type="number"
-              min="0"
-              value={quantity}
-              onChange={handleQuantityChange}
-              onBlur={() => {
-                if (quantity === 0) setQuantity(1);
-              }}
-              required
-            />
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="sale-quantity-modal">
+          <div className="modal-header">
+            <h2>Record Sale: {item.recipeName}</h2>
+            <button className="close-btn" onClick={onClose}>
+              <span className="material-icons">close</span>
+            </button>
           </div>
 
-          <div className="custom-order-toggle">
-            <label>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Sale Date</label>
               <input
-                type="checkbox"
-                checked={isCustomOrder}
-                onChange={(e) => setIsCustomOrder(e.target.checked)}
+                type="date"
+                value={saleDate}
+                onChange={(e) => setSaleDate(e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                required
               />
-              Custom Order
-            </label>
-          </div>
+            </div>
 
-          {isCustomOrder && (
-            <div className="addons-section">
-              <h3>Addons</h3>
-              {addons.map((addon, index) => (
-                <div key={index} className="addon-row">
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      placeholder="Addon name"
-                      value={addon.name}
-                      onChange={(e) => handleAddonChange(index, 'name', e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      placeholder="Quantity"
-                      value={addon.quantity}
-                      onChange={(e) => handleAddonChange(index, 'quantity', e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <select
-                      value={addon.unit}
-                      onChange={(e) => handleAddonChange(index, 'unit', e.target.value)}
+            <div className="form-group">
+              <label>Quantity</label>
+              <input
+                type="number"
+                min="0"
+                value={quantity}
+                onChange={handleQuantityChange}
+                onBlur={() => {
+                  if (quantity === 0) setQuantity(1);
+                }}
+                required
+              />
+            </div>
+
+            <div className="custom-order-toggle">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isCustomOrder}
+                  onChange={(e) => setIsCustomOrder(e.target.checked)}
+                />
+                Custom Order
+              </label>
+            </div>
+
+            {isCustomOrder && (
+              <div className="addons-section">
+                <h3>Addons</h3>
+                {addons.map((addon, index) => (
+                  <div key={index} className="addon-row">
+                    <div className="form-group">
+                      <input
+                        type="text"
+                        placeholder="Addon name"
+                        value={addon.name}
+                        onChange={(e) => handleAddonChange(index, 'name', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <input
+                        type="number"
+                        placeholder="Quantity"
+                        value={addon.quantity}
+                        onChange={(e) => handleAddonChange(index, 'quantity', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <select
+                        value={addon.unit}
+                        onChange={(e) => handleAddonChange(index, 'unit', e.target.value)}
+                      >
+                        <option value="">Unit</option>
+                        <option value="ml">ml</option>
+                        <option value="g">g</option>
+                        <option value="pcs">pcs</option>
+                        <option value="shots">shots</option>
+                        <option value="pumps">pumps</option>
+                      </select>
+                    </div>
+                    <button
+                      type="button"
+                      className="remove-addon"
+                      onClick={() => handleRemoveAddon(index)}
                     >
-                      <option value="">Unit</option>
-                      <option value="ml">ml</option>
-                      <option value="g">g</option>
-                      <option value="pcs">pcs</option>
-                      <option value="shots">shots</option>
-                      <option value="pumps">pumps</option>
-                    </select>
+                      <span className="material-icons">remove_circle</span>
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    className="remove-addon"
-                    onClick={() => handleRemoveAddon(index)}
-                  >
-                    <span className="material-icons">remove_circle</span>
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                className="add-addon"
-                onClick={handleAddAddon}
-              >
-                <span className="material-icons">add_circle</span>
-                Add Addon
+                ))}
+                <button
+                  type="button"
+                  className="add-addon"
+                  onClick={handleAddAddon}
+                >
+                  <span className="material-icons">add_circle</span>
+                  Add Addon
+                </button>
+              </div>
+            )}
+
+            <div className="modal-actions">
+              <button type="button" className="cancel-btn" onClick={onClose}>
+                Cancel
+              </button>
+              <button type="submit" className="confirm-btn">
+                Confirm Sale
               </button>
             </div>
+          </form>
+
+          {notification && (
+            <Notification
+              type={notification.type}
+              message={notification.message}
+              onClose={() => setNotification(null)}
+            />
           )}
-
-          <div className="modal-actions">
-            <button type="button" className="cancel-btn" onClick={onClose}>
-              Cancel
-            </button>
-            <button type="submit" className="confirm-btn">
-              Confirm Sale
-            </button>
-          </div>
-        </form>
-
-        {notification && (
-          <Notification
-            type={notification.type}
-            message={notification.message}
-            onClose={() => setNotification(null)}
-          />
-        )}
+        </div>
       </div>
     </div>
   );

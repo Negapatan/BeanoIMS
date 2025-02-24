@@ -112,6 +112,7 @@ service cloud.firestore {
           'category',
           'ingredients',
           'lastUpdated',
+          'saleDate',
           'createdAt'
         ])
         && request.resource.data.productName is string
@@ -120,6 +121,7 @@ service cloud.firestore {
         && request.resource.data.category is string
         && request.resource.data.ingredients is list
         && request.resource.data.lastUpdated is timestamp
+        && request.resource.data.saleDate is timestamp
         && request.resource.data.createdAt is timestamp;
       allow delete: if isAuthenticated() && (isAdmin() || isSuperAdmin());
     }

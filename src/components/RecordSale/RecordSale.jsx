@@ -47,11 +47,15 @@ const RecordSale = () => {
     try {
       setLoading(true);
       
+      // Convert date string to Firestore timestamp
+      const saleTimestamp = new Date(saleData.saleDate);
+      
       const salesRef = collection(db, 'sales');
       const q = query(
         salesRef,
         where('productName', '==', selectedItem.recipeName),
-        where('ingredients', '==', selectedItem.ingredients)
+        where('ingredients', '==', selectedItem.ingredients),
+        where('saleDate', '==', saleTimestamp)
       );
       
       const querySnapshot = await getDocs(q);
@@ -73,6 +77,7 @@ const RecordSale = () => {
           category: selectedItem.category,
           quantity: saleData.quantity,
           ingredients: selectedItem.ingredients,
+          saleDate: saleTimestamp,
           createdAt: serverTimestamp(),
           lastUpdated: serverTimestamp()
         });
@@ -101,7 +106,7 @@ const RecordSale = () => {
   return (
     <div className="record-sale-container">
       <div className="form-header">
-        <h1>Record Sale</h1>
+        <h1>Make Sale</h1>
       </div>
 
       <div className="filters-section">
