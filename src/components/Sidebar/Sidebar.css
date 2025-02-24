@@ -239,4 +239,26 @@
 
 .closed .logout-btn .menu-text {
   display: none;
+}
+
+.menu-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.menu-item.disabled:hover {
+  background: none;
+  color: inherit;
+}
+
+.lock-icon {
+  position: absolute;
+  right: 10px;
+  font-size: 16px !important;
+  opacity: 0.7;
+}
+
+.closed .lock-icon {
+  display: none;
 } 

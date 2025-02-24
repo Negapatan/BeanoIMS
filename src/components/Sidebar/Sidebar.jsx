@@ -7,8 +7,10 @@ import './Sidebar.css';
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, userRole } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const isAdminOrSuperAdmin = userRole === 'admin' || userRole === 'superadmin';
 
   const menuItems = [
     {
@@ -47,7 +49,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {
           path: '/dashboard/add-recipe',
           name: 'Add Recipe',
-          icon: 'menu_book'
+          icon: 'menu_book',
+          requiresAdmin: true
         }
       ]
     }
@@ -82,12 +85,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               {section.items.map((item) => (
                 <Link
                   key={item.path}
-                  to={item.path}
-                  className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
-                  title={item.name}
+                  to={item.requiresAdmin && !isAdminOrSuperAdmin ? '#' : item.path}
+                  className={`menu-item ${location.pathname === item.path ? 'active' : ''} 
+                    ${item.requiresAdmin && !isAdminOrSuperAdmin ? 'disabled' : ''}`}
+                  title={item.requiresAdmin && !isAdminOrSuperAdmin ? 
+                    'Only admin can access this feature' : item.name}
+                  onClick={(e) => {
+                    if (item.requiresAdmin && !isAdminOrSuperAdmin) {
+                      e.preventDefault();
+                    }
+                  }}
                 >
                   <span className="material-icons menu-icon">{item.icon}</span>
                   <span className="menu-text">{item.name}</span>
+                  {item.requiresAdmin && !isAdminOrSuperAdmin && (
+                    <span className="material-icons lock-icon">lock</span>
+                  )}
                 </Link>
               ))}
             </div>
