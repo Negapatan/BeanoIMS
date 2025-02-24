@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot, where } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import './SalesCounter.css';
 
@@ -19,8 +19,8 @@ const SalesCounter = () => {
       
       q = query(
         collection(db, 'sales'),
-        where('saleDate', '>=', startDate),
-        where('saleDate', '<=', endDate),
+        where('saleDate', '>=', Timestamp.fromDate(startDate)),
+        where('saleDate', '<=', Timestamp.fromDate(endDate)),
         orderBy('saleDate', 'desc'),
         orderBy('lastUpdated', 'desc')
       );
@@ -32,40 +32,50 @@ const SalesCounter = () => {
       );
     }
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      try {
-        const salesData = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            productName: data.productName,
-            category: data.category,
-            quantity: data.quantity,
-            ingredients: data.ingredients,
-            saleDate: data.saleDate?.toDate(),
-            lastUpdated: data.lastUpdated?.toDate()
-          };
-        });
+    const unsubscribe = onSnapshot(
+      q,
+      {
+        next: (snapshot) => {
+          try {
+            const salesData = snapshot.docs.map(doc => {
+              const data = doc.data();
+              return {
+                id: doc.id,
+                productName: data.productName,
+                category: data.category,
+                quantity: data.quantity,
+                ingredients: data.ingredients,
+                saleDate: data.saleDate?.toDate(),
+                lastUpdated: data.lastUpdated?.toDate()
+              };
+            });
 
-        // Group sales by date
-        const grouped = salesData.reduce((acc, sale) => {
-          const dateKey = sale.saleDate.toDateString();
-          if (!acc[dateKey]) {
-            acc[dateKey] = [];
+            // Group sales by date
+            const grouped = salesData.reduce((acc, sale) => {
+              const dateKey = sale.saleDate.toDateString();
+              if (!acc[dateKey]) {
+                acc[dateKey] = [];
+              }
+              acc[dateKey].push(sale);
+              return acc;
+            }, {});
+
+            setGroupedSales(grouped);
+            setError(null);
+            setLoading(false);
+          } catch (err) {
+            console.error('Error processing sales data:', err);
+            setError('Error loading sales data');
+            setLoading(false);
           }
-          acc[dateKey].push(sale);
-          return acc;
-        }, {});
-
-        setGroupedSales(grouped);
-        setError(null);
-      } catch (err) {
-        console.error('Error processing sales data:', err);
-        setError('Error loading sales data');
-      } finally {
-        setLoading(false);
+        },
+        error: (err) => {
+          console.error('Error fetching sales:', err);
+          setError('Error loading sales data');
+          setLoading(false);
+        }
       }
-    });
+    );
 
     return () => unsubscribe();
   }, [dateFilter]);
