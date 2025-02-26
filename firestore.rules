@@ -1,4 +1,4 @@
-rules_version = '2';
+  rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Helper functions
@@ -99,7 +99,11 @@ service cloud.firestore {
     // Recipes collection rules
     match /recipes/{recipeId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && (isAdmin() || isSuperAdmin());
+      allow create, update: if isAuthenticated() && (isAdmin() || isSuperAdmin());
+      allow delete: if isAuthenticated() && (isAdmin() || isSuperAdmin()) && (
+        // Additional validation for delete operation
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin']
+      );
     }
 
     // Sales collection rules

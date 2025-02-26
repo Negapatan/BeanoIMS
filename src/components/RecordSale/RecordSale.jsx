@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   collection, 
   addDoc, 
@@ -7,7 +7,8 @@ import {
   getDocs,
   updateDoc,
   doc,
-  serverTimestamp 
+  serverTimestamp,
+  deleteDoc 
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import './RecordSale.css';
@@ -15,6 +16,8 @@ import { recipeService } from '../../services/recipeService';
 import Notification from '../Notification/Notification';
 import SaleQuantityModal from './SaleQuantityModal';
 import { inventoryService } from '../../services/inventoryService';
+import { useAuth } from '../../contexts/AuthContext';
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 
 const RecordSale = () => {
   const [recipes, setRecipes] = useState([]);
@@ -24,6 +27,11 @@ const RecordSale = () => {
   const [notification, setNotification] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedLists, setExpandedLists] = useState({});
+  const dropdownRef = useRef({});
+  const { userRole } = useAuth();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [recipeToDelete, setRecipeToDelete] = useState(null);
 
   useEffect(() => {
     const unsubscribe = recipeService.subscribeToRecipes((updatedRecipes) => {
@@ -151,11 +159,82 @@ const RecordSale = () => {
     }
   };
 
+  const toggleList = (type, index) => {
+    setExpandedLists(prev => ({
+      ...prev,
+      [`${type}-${index}`]: !prev[`${type}-${index}`]
+    }));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setExpandedLists({});
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const renderList = (items, type, index) => {
+    if (!items || items.length === 0) return 'None';
+    
+    const isExpanded = expandedLists[`${type}-${index}`];
+    
+    return (
+      <div ref={dropdownRef}>
+        <ul className={`${type}-list ${!isExpanded ? 'collapsed-list' : ''}`}>
+          <li>{items[0].name}: {items[0].quantity} {items[0].unit}</li>
+          {items.length > 1 && !isExpanded && (
+            <button
+              className="show-more-btn"
+              onClick={() => toggleList(type, index)}
+            >
+              <span className="material-icons">add_circle_outline</span>
+              {items.length - 1} more
+            </button>
+          )}
+        </ul>
+        {isExpanded && (
+          <div className="dropdown-content">
+            {items.map((item, i) => (
+              <li key={i}>
+                {item.name}: {item.quantity} {item.unit}
+              </li>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const filteredRecipes = recipes.filter(recipe => {
     const matchesSearch = recipe.recipeName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || recipe.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleDeleteClick = (recipe) => {
+    if (!(userRole === 'admin' || userRole === 'superadmin')) {
+      showNotification('error', 'Only admin can delete recipes');
+      return;
+    }
+    setRecipeToDelete(recipe);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteDoc(doc(db, 'recipes', recipeToDelete.id));
+      showNotification('success', 'Recipe deleted successfully');
+      setShowDeleteConfirm(false);
+      setRecipeToDelete(null);
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+      showNotification('error', 'Failed to delete recipe');
+    }
+  };
 
   if (loading) {
     return <div className="loading">Loading recipes...</div>;
@@ -205,38 +284,37 @@ const RecordSale = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredRecipes.map((recipe) => (
+            {filteredRecipes.map((recipe, index) => (
               <tr key={recipe.id}>
                 <td>{recipe.recipeName}</td>
                 <td>{recipe.category}</td>
                 <td>{recipe.size || 'N/A'}</td>
                 <td>
-                  <ul className="ingredients-list">
-                    {recipe.ingredients.map((ing, index) => (
-                      <li key={index}>
-                        {ing.name}: {ing.quantity} {ing.unit}
-                      </li>
-                    ))}
-                  </ul>
+                  {renderList(recipe.ingredients, 'ingredients', index)}
                 </td>
                 <td>
-                  <ul className="packaging-list">
-                    {recipe.packaging?.map((pkg, index) => (
-                      <li key={index}>
-                        {pkg.name}: {pkg.quantity} {pkg.unit}
-                      </li>
-                    )) || 'No packaging'}
-                  </ul>
+                  {renderList(recipe.packaging, 'packaging', index)}
                 </td>
                 <td>
-                  <button
-                    className="record-btn"
-                    onClick={() => handleItemSelect(recipe)}
-                    disabled={loading}
-                  >
-                    <span className="material-icons">point_of_sale</span>
-                    Sale
-                  </button>
+                  <div className="action-buttons">
+                    <button
+                      className="record-btn"
+                      onClick={() => handleItemSelect(recipe)}
+                      disabled={loading}
+                    >
+                      <span className="material-icons">point_of_sale</span>
+                      Sale
+                    </button>
+                    <button
+                      className="delete-recipe-btn"
+                      onClick={() => handleDeleteClick(recipe)}
+                      disabled={loading || !(userRole === 'admin' || userRole === 'superadmin')}
+                      title={userRole === 'admin' || userRole === 'superadmin' ? 
+                        "Delete recipe" : "Only admin can delete recipes"}
+                    >
+                      <span className="material-icons">delete</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -257,6 +335,17 @@ const RecordSale = () => {
         onClose={() => setIsModalOpen(false)}
         item={selectedItem}
         onConfirm={handleSaleConfirm}
+      />
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete Recipe"
+        message={`Are you sure you want to delete ${recipeToDelete?.recipeName}?`}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setRecipeToDelete(null);
+        }}
       />
     </div>
   );
